@@ -77,10 +77,7 @@ func GetUserByEmail(email string) (*service.User, error) {
 	user := &service.User{
 		Email: email,
 	}
-	row := Db.QueryRow(
-		safeFilterQuery(usersTable, user, false),
-		email,
-	)
+	row := Db.QueryRow(safeFilterQuery(usersTable, user, false), email)
 	if err := row.Scan(
 		&user.ID,
 		&user.Email,
@@ -98,7 +95,7 @@ func GetUserByEmail(email string) (*service.User, error) {
 
 func UserExistsByEmail(email string) (bool, error) {
 	user := &service.User{Email: email}
-	row := Db.QueryRow(safeFilterQuery(usersTable, user, true))
+	row := Db.QueryRow(safeFilterQuery(usersTable, user, true), email)
 	var exists bool
 	if err := row.Scan(&exists); err != nil {
 		return false, fmt.Errorf("scan failed: %w", err)

@@ -38,7 +38,7 @@ func safeInsertQuery(table dbTable) string {
 		table.name,
 		strings.Join(table.dataColumns, ", "),
 		strings.Join(placeholders, ", "),
-		strings.Join(append([]string{table.pk}, table.defaultColumns...), ", "),
+		strings.Join(append(append([]string{table.pk}, table.dataColumns...), table.defaultColumns...), ", "),
 	)
 }
 

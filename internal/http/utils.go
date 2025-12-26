@@ -15,17 +15,16 @@ func sendJSONResponse(w http.ResponseWriter, data any, statusCode int) {
 }
 
 func sendErrorResponse(w http.ResponseWriter, message string, statusCode int) {
-	log.Println(message)
 	w.WriteHeader(statusCode)
 	response := map[string]string{"error": message}
 	json.NewEncoder(w).Encode(response)
 }
 
 func getUserIDFromContext(r *http.Request) (int, bool) {
-	value := r.Context().Value("userID")
+	value := r.Context().Value(userIDKey)
 	userID, ok := value.(int)
 	if !ok {
-		log.Println("Failed to assert type int to %v", value)
+		log.Printf("Failed to assert type int to %v", value)
 		return 0, false
 	}
 	return userID, true

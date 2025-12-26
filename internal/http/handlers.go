@@ -17,6 +17,7 @@ func RegisterHandler(w http.ResponseWriter, r *http.Request) {
 
 	emailBusy, err := database.UserExistsByEmail(data.Email)
 	if err != nil {
+		log.Println(err)
 		sendErrorResponse(w, "Failed to check if email is busy", http.StatusInternalServerError)
 		return
 	}
@@ -28,12 +29,14 @@ func RegisterHandler(w http.ResponseWriter, r *http.Request) {
 
 	passwordHash, err := auth.HashPassword(data.Password)
 	if err != nil {
+		log.Println(err)
 		sendErrorResponse(w, "Failed to hash the password", http.StatusInternalServerError)
 		return
 	}
 
 	user, err := database.CreateUser(data.Email, data.Username, passwordHash)
 	if err != nil {
+		log.Println(err)
 		sendErrorResponse(w, "Failed to create a user", http.StatusInternalServerError)
 		return
 	}
@@ -49,6 +52,7 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 
 	user, err := database.GetUserByEmail(data.Email)
 	if err != nil {
+		log.Println(err)
 		sendErrorResponse(w, "Failed to fetch a user", http.StatusInternalServerError)
 		return
 	}
@@ -66,6 +70,7 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 
 	token, err := auth.GenerateToken(*user)
 	if err != nil {
+		log.Println(err)
 		sendErrorResponse(w, "Failed to generate a token", http.StatusInternalServerError)
 		return
 	}
@@ -88,10 +93,12 @@ func ProfileHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	user, err := database.GetUserByID(userID)
 	if err != nil {
+		log.Println(err)
 		sendErrorResponse(w, "Failed to fetch a user", http.StatusInternalServerError)
 		return
 	}
 	if user == nil {
+		log.Println(err)
 		sendErrorResponse(w, "User does not exist", http.StatusNotFound)
 		return
 	}
@@ -101,6 +108,7 @@ func ProfileHandler(w http.ResponseWriter, r *http.Request) {
 func HealthHandler(w http.ResponseWriter, r *http.Request) {
 	if database.Db != nil {
 		if err := database.Db.Ping(); err != nil {
+			log.Println(err)
 			sendErrorResponse(w, "Database connection failed", http.StatusServiceUnavailable)
 			return
 		}

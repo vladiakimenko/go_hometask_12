@@ -12,7 +12,7 @@ import (
 
 type contextKey string
 
-const bearerPrefix string = "Bearer"
+const bearerPrefix string = "Bearer "
 const maxBodySize int = 1 << 20
 
 const parsedBodyKey contextKey = "parsedBody"
@@ -42,6 +42,7 @@ func ModelBodyMiddleware[T any](next func(w http.ResponseWriter, r *http.Request
 			decoder := json.NewDecoder(r.Body)
 			decoder.DisallowUnknownFields()
 			if err := decoder.Decode(&data); err != nil {
+				log.Println(err)
 				if errors.As(err, new(*http.MaxBytesError)) {
 					sendErrorResponse(w, "Request body too large", http.StatusRequestEntityTooLarge)
 					return
@@ -83,11 +84,12 @@ func AuthMiddleware(next http.HandlerFunc) http.HandlerFunc {
 
 		claims, err := auth.ValidateToken(reqToken)
 		if err != nil {
+			log.Println(err)
 			sendErrorResponse(w, "Auth token invalid", http.StatusUnauthorized)
 			return
 		}
 
-		ctx := context.WithValue(r.Context(), userIDKey, claims.UserID)
+		ctx := context.WithValue(r.Context(), userIDKey, int(claims.UserID))
 		next.ServeHTTP(w, r.WithContext(ctx))
 	}
 }
