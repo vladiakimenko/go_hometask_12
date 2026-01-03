@@ -13,6 +13,7 @@ func RegisterHandler(w http.ResponseWriter, r *http.Request) {
 	data := r.Context().Value(parsedBodyKey).(*service.RegisterRequest) // не может зафейлить после мидлвары
 	if err := data.Validate(); err != nil {
 		sendErrorResponse(w, err.Error(), http.StatusBadRequest)
+		return
 	}
 
 	emailBusy, err := database.UserExistsByEmail(data.Email)
@@ -48,6 +49,7 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 	data := r.Context().Value(parsedBodyKey).(*service.LoginRequest)
 	if err := data.Validate(); err != nil {
 		sendErrorResponse(w, err.Error(), http.StatusBadRequest)
+		return
 	}
 
 	user, err := database.GetUserByEmail(data.Email)
